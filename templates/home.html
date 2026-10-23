@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}FitTrack - Home{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <!-- Hero Section -->
+    <div class="row align-items-center py-5">
+
+        <div class="col-12 col-md-7">
+
+            <p class="text-primary fw-bold mb-2">
+                FITNESS & WORKOUT TRACKING
+            </p>
+
+            <h1 class="display-4 fw-bold">
+                Track Your Workouts.
+                <br>
+                Build Your Progress.
+            </h1>
+
+            <p class="lead text-muted mt-3">
+                FitTrack helps you record your workouts,
+                manage your exercises, and keep track of your fitness journey.
+            </p>
+
+            <div class="d-flex flex-wrap gap-2 mt-4">
+
+                <a
+                    href="{{ url_for('auth.login') }}"
+                    class="btn btn-primary btn-lg">
+                    Login
+                </a>
+
+                <a
+                    href="{{ url_for('auth.register') }}"
+                    class="btn btn-outline-primary btn-lg">
+                    Create an Account
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-12 col-md-5 mt-5 mt-md-0">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h3 class="fw-bold">
+                        Why FitTrack?
+                    </h3>
+
+                    <p class="text-muted">
+                        Everything you need to organize and monitor
+                        your workout activities in one place.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Features -->
+
+    <div class="row g-4 mt-4">
+
+        <div class="col-12 col-md-4">
+
+            <div class="card h-100 shadow-sm">
+
+                <div class="card-body">
+
+                    <h4 class="fw-bold">
+                        🏋️ Track Workouts
+                    </h4>
+
+                    <p class="text-muted">
+                        Record your workouts, exercises, sets,
+                        reps, and weights.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-12 col-md-4">
+
+            <div class="card h-100 shadow-sm">
+
+                <div class="card-body">
+
+                    <h4 class="fw-bold">
+                        📋 Manage Exercises
+                    </h4>
+
+                    <p class="text-muted">
+                        Add and manage exercises for each
+                        workout session.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-12 col-md-4">
+
+            <div class="card h-100 shadow-sm">
+
+                <div class="card-body">
+
+                    <h4 class="fw-bold">
+                        🎯 Stay Consistent
+                    </h4>
+
+                    <p class="text-muted">
+                        Keep your workout records organized
+                        and stay focused on your fitness goals.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}FitTrack - Edit Workout{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-12 col-md-8 col-lg-6">
+
+            <div class="mb-4">
+
+                <h1 class="fw-bold">Edit Workout</h1>
+
+                <p class="text-muted">
+                    Update your workout information.
+                </p>
+
+            </div>
+
+            <div class="card shadow-sm">
+
+                <div class="card-body p-4">
+
+                    {% if error %}
+
+                        <div class="alert alert-danger" role="alert">
+                            {{ error }}
+                        </div>
+
+                    {% endif %}
+
+                    <form method="POST">
+
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
+                        <!-- Workout Name -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="workout_name"
+                                class="form-label">
+                                Workout Name
+                            </label>
+
+                            <input
+                                type="text"
+                                name="workout_name"
+                                id="workout_name"
+                                class="form-control"
+                                value="{{ workout.workout_name }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Workout Date -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="workout_date"
+                                class="form-label">
+                                Workout Date
+                            </label>
+
+                            <input
+                                type="date"
+                                name="workout_date"
+                                id="workout_date"
+                                class="form-control"
+                                value="{{ workout.workout_date }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Notes -->
+
+                        <div class="mb-4">
+
+                            <label
+                                for="notes"
+                                class="form-label">
+                                Notes
+                            </label>
+
+                            <textarea
+                                name="notes"
+                                id="notes"
+                                class="form-control"
+                                rows="5"
+                                placeholder="Add notes about your workout..."
+                            >{{ workout.notes or "" }}</textarea>
+
+                        </div>
+
+
+                        <!-- Buttons -->
+
+                        <div class="d-flex flex-wrap gap-2">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary">
+                                Save Changes
+                            </button>
+
+                            <a
+                                href="{{ url_for('workout.workouts') }}"
+                                class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

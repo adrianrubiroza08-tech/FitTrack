@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block title %}FitTrack - My Progress{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+        <h1 class="fw-bold">My Progress</h1>
+        <p class="text-muted mb-0">
+            Track your weight and BMI over time.
+        </p>
+    </div>
+
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <div class="row g-4 mb-4">
+
+        <!-- Log weight form -->
+        <div class="col-12 col-lg-5">
+            <div class="card shadow-sm h-100">
+                <div class="card-body p-4">
+
+                    <h3 class="card-title mb-3">Log Weight</h3>
+
+                    <form method="POST">
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
+                        <div class="mb-3">
+                            <label for="weight" class="form-label">
+                                Weight (kg)
+                            </label>
+
+                            <input
+                                type="number"
+                                name="weight"
+                                id="weight"
+                                class="form-control"
+                                min="20"
+                                max="500"
+                                step="0.1"
+                                placeholder="e.g. 70.5"
+                                required
+                            >
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="height" class="form-label">
+                                Height (cm)
+                            </label>
+
+                            <input
+                                type="number"
+                                name="height"
+                                id="height"
+                                class="form-control"
+                                min="100"
+                                max="250"
+                                step="0.1"
+                                value="{{ default_height }}"
+                                placeholder="e.g. 170"
+                                required
+                            >
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="log_date" class="form-label">
+                                Date
+                            </label>
+
+                            <input
+                                type="date"
+                                name="log_date"
+                                id="log_date"
+                                class="form-control"
+                                value="{{ today }}"
+                                required
+                            >
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary w-100"
+                        >
+                            Save Progress
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Before and current progress -->
+        <div class="col-12 col-lg-7">
+
+            {% if first and latest %}
+
+                <div class="row g-3">
+
+                    <div class="col-12 col-md-6">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Before</h5>
+
+                                <p class="display-6 fw-bold mb-1">
+                                    {{ "%.1f"|format(first.weight_kg) }} kg
+                                </p>
+
+                                <p class="text-muted mb-1">
+                                    BMI:
+                                    {{ "%.1f"|format(first.bmi) }}
+                                </p>
+
+                                <p class="text-muted mb-0">
+                                    {{ first.label }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Latest</h5>
+
+                                <p class="display-6 fw-bold mb-1">
+                                    {{ "%.1f"|format(latest.weight_kg) }} kg
+                                </p>
+
+                                <p class="text-muted mb-1">
+                                    BMI:
+                                    {{ "%.1f"|format(latest.bmi) }}
+                                </p>
+
+                                <p class="text-muted mb-0">
+                                    {{ latest.label }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                {% if summary %}
+                    <div class="card shadow-sm mt-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Your Progress</h5>
+
+                            <p class="mb-1">
+                                Weight change:
+                                <strong>
+                                    {{ "%.1f"|format(summary.weight_change) }} kg
+                                </strong>
+                            </p>
+
+                            <p class="mb-1">
+                                BMI change:
+                                <strong>
+                                    {{ "%.1f"|format(summary.bmi_change) }}
+                                </strong>
+                            </p>
+
+                            <p class="text-muted mb-0">
+                                Days tracked:
+                                {{ summary.days }}
+                            </p>
+                        </div>
+                    </div>
+                {% endif %}
+
+            {% else %}
+
+                <div class="card shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <h3 class="card-title">Start Tracking</h3>
+
+                        <p class="text-muted mb-0">
+                            Record your first weight to begin tracking your
+                            BMI and progress.
+                        </p>
+                    </div>
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- History -->
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="card-title mb-0">Weight History</h3>
+
+                <a
+                    href="{{ url_for('dashboard.dashboard_page') }}"
+                    class="btn btn-outline-secondary btn-sm"
+                >
+                    Back to Dashboard
+                </a>
+            </div>
+
+            {% if history %}
+
+                <div class="table-responsive">
+                    <table class="table progress-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Weight</th>
+                                <th>Height</th>
+                                <th>BMI</th>
+                                <th>Category</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for log in history %}
+                                <tr>
+                                    <td>{{ log.label }}</td>
+
+                                    <td>
+                                        {{ "%.1f"|format(log.weight_kg) }} kg
+                                    </td>
+
+                                    <td>
+                                        {{ "%.1f"|format(log.height_cm) }} cm
+                                    </td>
+
+                                    <td>
+                                        {{ "%.1f"|format(log.bmi) }}
+                                    </td>
+
+                                    <td>
+                                        <span class="badge text-bg-{{ log.badge }}">
+                                            {{ log.category }}
+                                        </span>
+                                    </td>
+
+                                    <td class="text-end">
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for(
+                                                'progress.delete_log',
+                                                log_id=log.id
+                                            ) }}"
+                                            class="d-inline"
+                                        >
+                                            <input
+                                                type="hidden"
+                                                name="csrf_token"
+                                                value="{{ csrf_token() }}"
+                                            >
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-outline-danger btn-sm"
+                                                onclick="return confirm(
+                                                    'Delete this progress entry?'
+                                                );"
+                                            >
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            {% else %}
+
+                <p class="text-muted mb-0">
+                    No progress entries yet.
+                </p>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

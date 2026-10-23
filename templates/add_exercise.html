@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+
+{% block title %}FitTrack - Add Exercise{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-12 col-md-8 col-lg-6">
+
+            <div class="mb-4">
+                <h1 class="fw-bold">Add Exercise</h1>
+
+                <p class="text-muted mb-1">
+                    Add an exercise to your workout.
+                </p>
+
+                <p>
+                    Workout:
+                    <strong>{{ workout.workout_name }}</strong>
+                </p>
+            </div>
+
+            <div class="card shadow-sm">
+
+                <div class="card-body p-4">
+
+                    {% if error %}
+
+                        <div class="alert alert-danger" role="alert">
+                            {{ error }}
+                        </div>
+
+                    {% endif %}
+
+                    <form method="POST">
+
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="source"
+                            value="{{ source }}"
+                        >
+
+                        <!-- Muscle Group -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="muscle_group"
+                                class="form-label">
+                                Body Part
+                            </label>
+
+                            <select
+                                id="muscle_group"
+                                class="form-select"
+                                required
+                            >
+
+                                <option value="">
+                                    Select a body part
+                                </option>
+
+                                {% for group in exercises|map(attribute='muscle_group')|unique|sort %}
+
+                                    <option value="{{ group }}">
+                                        {{ group }}
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Exercise -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="exercise_id"
+                                class="form-label">
+                                Exercise
+                            </label>
+
+                            <select
+                                name="exercise_id"
+                                id="exercise_id"
+                                class="form-select"
+                                required
+                                disabled
+                            >
+
+                                <option value="">
+                                    Select a body part first
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Sets -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="sets"
+                                class="form-label">
+                                Sets
+                            </label>
+
+                            <input
+                                type="number"
+                                name="sets"
+                                id="sets"
+                                class="form-control"
+                                min="1"
+                                placeholder="e.g. 3"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Reps -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="reps"
+                                class="form-label">
+                                Reps
+                            </label>
+
+                            <input
+                                type="number"
+                                name="reps"
+                                id="reps"
+                                class="form-control"
+                                min="1"
+                                placeholder="e.g. 10"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Weight -->
+
+                        <div class="mb-4">
+
+                            <label
+                                for="weight"
+                                class="form-label">
+                                Weight (kg)
+                            </label>
+
+                            <input
+                                type="number"
+                                name="weight"
+                                id="weight"
+                                class="form-control"
+                                min="0"
+                                step="0.01"
+                                placeholder="e.g. 50"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Buttons -->
+
+                        <div class="d-flex flex-wrap gap-2">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary">
+                                Add Exercise
+                            </button>
+
+                            <a
+                                href="{% if source == 'workouts' %}{{ url_for('workout.workouts') }}{% else %}{{ url_for('workout.view_workout', workout_id=workout.id) }}{% endif %}"
+                                class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+
+                            <button
+                                type="button"
+                                id="tutorial-btn"
+                                class="btn btn-outline-primary ms-auto d-none">
+                                ▶ Show Tutorial
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script type="application/json" id="exercise-data">
+{
+    {% for group in exercises|map(attribute='muscle_group')|unique|sort %}
+    "{{ group }}": [
+        {% for exercise in exercises if exercise.muscle_group == group %}
+        {"id": {{ exercise.id }}, "name": {{ exercise.name|tojson }}}{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]{% if not loop.last %},{% endif %}
+    {% endfor %}
+}
+</script>
+
+<script>
+    const exercisesByGroup = JSON.parse(
+        document.getElementById("exercise-data").textContent
+    );
+
+    const muscleGroupSelect = document.getElementById("muscle_group");
+    const exerciseSelect = document.getElementById("exercise_id");
+
+    muscleGroupSelect.addEventListener("change", function () {
+
+        const selectedGroup = this.value;
+
+        exerciseSelect.innerHTML = "";
+
+        if (!selectedGroup) {
+            exerciseSelect.disabled = true;
+
+            const placeholder = document.createElement("option");
+            placeholder.value = "";
+            placeholder.textContent = "Select a body part first";
+            exerciseSelect.appendChild(placeholder);
+
+            return;
+        }
+
+        exerciseSelect.disabled = false;
+
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = "Select an exercise";
+        exerciseSelect.appendChild(placeholder);
+
+        exercisesByGroup[selectedGroup].forEach(function (exercise) {
+            const option = document.createElement("option");
+            option.value = exercise.id;
+            option.textContent = exercise.name;
+            exerciseSelect.appendChild(option);
+        });
+
+    });
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="{{ url_for('static', filename='css/js/tutorial.js') }}"></script>
+<script>
+    const tutorialBtn = document.getElementById("tutorial-btn");
+
+    function refreshTutorialButton() {
+        const id = parseInt(exerciseSelect.value, 10);
+        tutorialBtn.classList.toggle("d-none", !(id && FitTrackTutorial.has(id)));
+    }
+
+    muscleGroupSelect.addEventListener("change", refreshTutorialButton);
+    exerciseSelect.addEventListener("change", refreshTutorialButton);
+
+    tutorialBtn.addEventListener("click", function () {
+        FitTrackTutorial.open(parseInt(exerciseSelect.value, 10), tutorialBtn);
+    });
+</script>
+
+{% endblock %}

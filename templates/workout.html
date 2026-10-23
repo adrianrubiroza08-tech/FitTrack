@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}FitTrack - My Workouts{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h1 class="fw-bold mb-1">My Workouts</h1>
+            <p class="text-muted mb-0">
+                View and manage your workout records.
+            </p>
+        </div>
+
+        <a href="{{ url_for('workout.create_workout', source='workouts') }}"
+           class="btn btn-primary">
+            + Log New Workout
+        </a>
+
+    </div>
+
+    {% if workouts %}
+
+        <div class="row g-4">
+
+            {% for workout in workouts %}
+
+                <div class="col-12 col-md-6">
+
+                    <div class="card shadow-sm h-100">
+
+                        <div class="card-body">
+
+                            <h3 class="card-title fw-bold">
+                                {{ workout.workout_name }}
+                            </h3>
+
+                            <p class="text-muted mb-2">
+                                📅 {{ workout.workout_date }}
+                            </p>
+
+                            {% if workout.notes %}
+
+                                <p class="card-text">
+                                    <strong>Notes:</strong>
+                                    {{ workout.notes }}
+                                </p>
+
+                            {% else %}
+
+                                <p class="text-muted">
+                                    No notes added.
+                                </p>
+
+                            {% endif %}
+
+                            <div class="d-flex flex-wrap gap-2 mt-3">
+
+                                <a href="{{ url_for('workout.view_workout', workout_id=workout.id) }}"
+                                   class="btn btn-primary btn-sm">
+                                    View
+                                </a>
+
+                                <a href="{{ url_for('workout.edit_workout', workout_id=workout.id) }}"
+                                   class="btn btn-outline-primary btn-sm">
+                                    Edit
+                                </a>
+
+                                <a href="{{ url_for('workout.add_exercise', workout_id=workout.id, source='workouts') }}"
+                                   class="btn btn-outline-success btn-sm">
+                                    Add Exercise
+                                </a>
+
+                                <form
+                                    action="{{ url_for('workout.delete_workout', workout_id=workout.id) }}"
+                                    method="POST"
+                                    class="d-inline"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="csrf_token"
+                                        value="{{ csrf_token() }}"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-outline-danger btn-sm"
+                                        onclick="return confirm('Are you sure you want to delete this workout?');"
+                                    >
+                                        Delete
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="card shadow-sm text-center">
+
+            <div class="card-body py-5">
+
+                <h3>No Workouts Yet</h3>
+
+                <p class="text-muted">
+                    You haven't recorded any workouts yet.
+                </p>
+
+                <a href="{{ url_for('workout.create_workout', source='workouts') }}"
+                   class="btn btn-primary">
+                    + Log Your First Workout
+                </a>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

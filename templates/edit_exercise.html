@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}FitTrack - Edit Exercise{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-12 col-md-8 col-lg-6">
+
+            <div class="mb-4">
+
+                <h1 class="fw-bold">Edit Exercise</h1>
+
+                <p class="text-muted mb-1">
+                    Update the details of this exercise.
+                </p>
+
+                <p>
+                    Exercise:
+                    <strong>{{ exercise.exercise_name }}</strong>
+                </p>
+
+            </div>
+
+            <div class="card shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <form method="POST">
+
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
+                        <!-- Sets -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="sets"
+                                class="form-label">
+                                Sets
+                            </label>
+
+                            <input
+                                type="number"
+                                name="sets"
+                                id="sets"
+                                class="form-control"
+                                min="1"
+                                value="{{ exercise.sets }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Reps -->
+
+                        <div class="mb-3">
+
+                            <label
+                                for="reps"
+                                class="form-label">
+                                Reps
+                            </label>
+
+                            <input
+                                type="number"
+                                name="reps"
+                                id="reps"
+                                class="form-control"
+                                min="1"
+                                value="{{ exercise.reps }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Weight -->
+
+                        <div class="mb-4">
+
+                            <label
+                                for="weight"
+                                class="form-label">
+                                Weight (kg)
+                            </label>
+
+                            <input
+                                type="number"
+                                name="weight"
+                                id="weight"
+                                class="form-control"
+                                min="0"
+                                step="0.01"
+                                value="{{ exercise.weight }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Buttons -->
+
+                        <div class="d-flex flex-wrap gap-2">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary">
+                                Save Changes
+                            </button>
+
+                            <a
+                                href="{{ url_for('workout.view_workout', workout_id=workout_id) }}"
+                                class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

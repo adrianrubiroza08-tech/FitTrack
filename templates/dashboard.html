@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}FitTrack - Dashboard{% endblock %}
+
+{% block content %}
+
+<style>
+    .bmi-card { width: 100%; max-width: 380px; }
+    .bmi-value { font-size: 2.8rem; font-weight: 800; line-height: 1; letter-spacing: -.04em; color: var(--ink); }
+    .bmi-label { font-weight: 800; font-size: 1rem; padding-bottom: .2rem; }
+    .bmi-underweight { color: #5ab0ff; }
+    .bmi-normal { color: #38d27a; }
+    .bmi-overweight { color: #ffb84a; }
+    .bmi-obese { color: #ff5f56; }
+    .bmi-track { position: relative; margin: 1.1rem 0 .6rem; }
+    .bmi-bar { display: flex; height: 10px; border-radius: 999px; overflow: hidden; }
+    .bmi-bar span { display: block; height: 100%; }
+    .bmi-pin { position: absolute; top: -5px; width: 4px; height: 20px; border-radius: 2px; background: #fff; box-shadow: 0 0 0 2px rgba(0, 0, 0, .5); transform: translateX(-50%); }
+    .bmi-note { font-size: .78rem; color: var(--muted); margin: 0; }
+</style>
+
+<div class="container py-4">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-4 mb-4">
+
+        <div>
+            <h1 class="fw-bold">Welcome, {{ user_name }}! </h1>
+            <p class="text-muted mb-0">
+                Your Fitness Dashboard
+            </p>
+        </div>
+
+        <div class="card shadow-sm bmi-card">
+            <div class="card-body p-3">
+
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="card-title mb-0">Your BMI</h5>
+                    <a href="{{ url_for('progress.progress_page') }}" class="small">View progress</a>
+                </div>
+
+                {% if bmi %}
+
+                    <div class="d-flex align-items-end gap-3">
+                        <span class="bmi-value">{{ '%.1f'|format(bmi.value) }}</span>
+                        <span class="bmi-label bmi-{{ bmi.category|lower }}">{{ bmi.category }}</span>
+                    </div>
+
+                    <div class="bmi-track">
+                        <div class="bmi-bar">
+                            <span style="width: 14%; background: #5ab0ff;"></span>
+                            <span style="width: 26%; background: #38d27a;"></span>
+                            <span style="width: 20%; background: #ffb84a;"></span>
+                            <span style="width: 40%; background: #ff5f56;"></span>
+                        </div>
+                        <div class="bmi-pin" data-pin="{{ bmi.pin }}"></div>
+                    </div>
+
+                    <p class="bmi-note">
+                        Under 18.5 underweight &middot; 18.5 to 24.9 normal &middot;
+                        25 to 29.9 overweight &middot; 30 and above obese
+                    </p>
+                    <p class="bmi-note mt-2">
+                        Healthy weight for your height:
+                        {{ bmi.healthy_low }} to {{ bmi.healthy_high }} kg.
+                        Last logged {{ bmi.date }} at {{ '%.1f'|format(bmi.weight) }} kg.
+                    </p>
+
+                {% else %}
+
+                    <p class="text-muted mb-2">
+                        Enter your weight and height to see where you stand.
+                    </p>
+
+                {% endif %}
+
+                <form action="{{ url_for('progress.progress_page') }}" method="POST" class="row g-2 mt-1">
+
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="log_date" value="{{ today }}">
+
+                    <div class="col-5">
+                        <input type="number" name="weight" class="form-control"
+                               min="20" max="500" step="0.1" placeholder="kg"
+                               aria-label="Weight in kg" required>
+                    </div>
+
+                    <div class="col-4">
+                        <input type="number" name="height" class="form-control"
+                               min="100" max="250" step="0.1" placeholder="cm"
+                               value="{{ bmi.height if bmi else '' }}"
+                               aria-label="Height in cm" required>
+                    </div>
+
+                    <div class="col-3">
+                        <button type="submit" class="btn btn-primary w-100 px-0">Save</button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+
+            <h3 class="card-title">Your Statistics</h3>
+
+            <p class="mb-0">
+                Total Workouts:
+                <strong>{{ total_workouts }}</strong>
+            </p>
+
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+
+            <h3 class="card-title">Recent Workouts</h3>
+
+            {% if recent_workouts %}
+
+                <div class="list-group mt-3">
+
+                    {% for workout in recent_workouts %}
+
+                        <div class="list-group-item">
+
+                            <strong>{{ workout.workout_name }}</strong>
+
+                            <span class="text-muted">
+                                - {{ workout.workout_date }}
+                            </span>
+
+                            {% if workout.notes %}
+                                <br>
+
+                                <small class="text-muted">
+                                    Notes: {{ workout.notes }}
+                                </small>
+                            {% endif %}
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <p class="text-muted mt-3">
+                    You haven't recorded any workouts yet.
+                </p>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <h3 class="card-title">Quick Actions</h3>
+
+            <div class="d-flex flex-wrap gap-2 mt-3">
+
+                <a href="{{ url_for('workout.create_workout', source='dashboard') }}"
+                   class="btn btn-primary">
+                    Log Workout
+                </a>
+
+                <a href="{{ url_for('workout.workouts') }}"
+                   class="btn btn-outline-primary">
+                    View Workouts
+                </a>
+
+                <a href="{{ url_for('progress.progress_page') }}"
+                   class="btn btn-outline-primary">
+                    My Progress
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
